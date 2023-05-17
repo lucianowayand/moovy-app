@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { apiBaseUrl } from '../../config/env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const api = axios.create({
   baseURL: apiBaseUrl,
@@ -10,9 +11,9 @@ api.interceptors.response.use(
   response => response,
   error => {
     console.log(apiBaseUrl)
-    // if (error.response.status === 401) {
-    //   window.location.href = 'Login';
-    // }
+    if (error.response.status === 401) {
+      AsyncStorage.removeItem('session');
+    }
     return Promise.reject(error);
   }
 );

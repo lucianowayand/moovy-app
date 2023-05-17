@@ -5,7 +5,7 @@ import Router from './src/routes';
 function App() {
     return (
         <PaperProvider>
-            <Router />
+                <Router />
         </PaperProvider>
     );
 }

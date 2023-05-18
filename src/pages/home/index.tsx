@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Movie } from '../../utils/types';
 import { api } from '../../services/api';
 import AppIntroSlider from "react-native-app-intro-slider"
+import { Audio } from 'expo-av';
 
 export default function Home({ navigation }: any) {
     const [fontsLoaded] = useFonts({
@@ -15,6 +16,9 @@ export default function Home({ navigation }: any) {
     const [movies, setMovies] = useState<Movie[]>([])
     const [selectedMovie, setSelectedMovie] = useState<number>(0)
     const { user } = useAuth()
+
+    const [recording, setRecording] = useState<any>(null);
+    const [recordings, setRecordings] = useState<any>([]);
 
     const [dialog, setDialog] = useState<boolean>(false)
 
@@ -48,6 +52,37 @@ export default function Home({ navigation }: any) {
         navigation.navigate('Settings')
     }
 
+    async function startRecording() {
+        try {
+            const permission = await Audio.requestPermissionsAsync();
+            if (permission.status === "granted") {
+                await Audio.setAudioModeAsync({
+                    allowsRecordingIOS: true,
+                    playsInSilentModeIOS: true,
+                });
+
+                const { recording } = await Audio.Recording.createAsync();
+                setRecording(recording);
+            } else {
+                alert("Permission to access microphone was denied");
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function stopRecording() {
+        setRecording(undefined)
+        await recording.stopAndUnloadAsync();
+
+        let updatedRecordings = [...recordings];
+        const { sound, status } = await recording.createNewLoadedSoundAsync();
+        updatedRecordings.push({ sound: sound, duration: status.durationMillis, file: recording.getURI() });
+
+        setRecordings(updatedRecordings);
+        console.log(updatedRecordings)
+    }
+
     function MovieCards({ item }: any) {
         return <View style={{ flex: 1, backgroundColor: "white", borderRadius: 5, padding: "10%" }}>
             <Image source={{ uri: item.Poster }} style={{ height: "75%" }} />
@@ -61,6 +96,25 @@ export default function Home({ navigation }: any) {
         </View>
     }
 
+    function RecordingComponent() {
+        return <View>
+            <Button onPress={recording ? stopRecording : startRecording}>
+                <Text>{recording ? 'Stop Recording' : 'Start Recording'}</Text>
+            </Button>
+            <View style={{ marginTop: "5%" }}>
+                {recordings.map((recording: any, index: any) => {
+                    return (
+                        <View key={index}>
+                            <Text>Recording {index} - {recording.duration}</Text>
+                            <Button onPress={() => { recording.sound.playAsync() }}>
+                                <Text>Play</Text>
+                            </Button>
+                        </View>
+                    );
+                })}
+            </View>
+        </View>
+    }
 
     async function updateReview(movie: Movie) {
         const res = await api.patch(`library/user/${user?.id}/movie/${movie.imdbID}`, { review: movie.Review })

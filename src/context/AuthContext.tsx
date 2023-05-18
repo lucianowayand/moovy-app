@@ -61,7 +61,7 @@ function AuthProvider({ children, navigation }: { children: React.ReactNode, nav
     async function logIn(email: string, password: string) {
         try {
             const res = await api.post("/users/login", { email, password });
-            await AsyncStorage.setItem('session', JSON.stringify(res.data))
+            await AsyncStorage.setItem('session', res.data)
             await AsyncStorage.setItem('email', email)
             getUserFromSession()
             return true

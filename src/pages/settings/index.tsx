@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import { Divider, IconButton, List } from "react-native-paper";
 import { useAuth } from "../../context/AuthContext";
+import config from "../../../package.json";
 
 export default function Settings({ navigation }: any) {
     const { user, logOut } = useAuth();
@@ -37,7 +38,7 @@ export default function Settings({ navigation }: any) {
             <Divider style={{ marginVertical: "10%" }} />
             <View style={{ display: 'flex', alignItems: "center" }}>
                 <Text style={{ fontSize: 18 }}>Version</Text>
-                <Text style={{ fontSize: 14 }}>1.0.0</Text>
+                <Text style={{ fontSize: 14 }}>{config.version}</Text>
             </View>
         </View>
     </View>

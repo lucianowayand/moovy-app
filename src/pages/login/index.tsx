@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import { Button, TextInput, Snackbar } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,11 +22,16 @@ export default function Login({ navigation }: any) {
     useFocusEffect(() => {
         if (user) {
             navigation.navigate('Home')
-        } else {
-            getEmailFromStorage()
         }
         setLoading(false)
     });
+    
+    useEffect(() => {
+        if (!user) {
+            getEmailFromStorage()
+        }
+        setLoading(false)
+    }, []);
 
     async function submitLogin() {
         const result = await logIn(email, password)

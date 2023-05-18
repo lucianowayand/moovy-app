@@ -6,4 +6,5 @@ export interface Movie {
     imdbID: string;
     imdbRating: string;
     inLibrary: boolean;
+    Review: string;
 }

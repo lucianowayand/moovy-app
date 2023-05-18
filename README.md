@@ -10,7 +10,7 @@ This is the mobile app service for the Fullstack Challenge. It enables the user 
 * Base-64
 * Expo
 
-# Prerequisites
+# Pre-requisites
 To run this service, you need to have the following installed on your system:
 * Node.js
 * Expo CLI: `npm install -g expo-cli`

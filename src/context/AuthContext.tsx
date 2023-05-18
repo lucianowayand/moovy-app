@@ -13,7 +13,7 @@ interface AuthContextValues {
     user: User | null | undefined;
     setUser: (user: User | null) => void;
     logOut: () => void;
-    logIn: (email: string, password: string) => void;
+    logIn: (email: string, password: string) => Promise<boolean> | void;
 }
 
 const AuthContext = createContext<AuthContextValues>({
@@ -29,7 +29,7 @@ function AuthProvider({ children, navigation }: { children: React.ReactNode, nav
     useEffect(() => {
         getUserFromSession()
     }, [])
-    
+
     async function getUserFromSession() {
         try {
             const jwt = await AsyncStorage.getItem('session')
@@ -44,21 +44,13 @@ function AuthProvider({ children, navigation }: { children: React.ReactNode, nav
                 navigation.navigate('Home')
 
             } else {
-                if (window.location.pathname !== '/') {
-                    logOut()
-                }
+                logOut()
             }
             return user
         } catch (err) {
             console.log(err);
         }
     }
-
-
-    // Printing user for debugging purposes
-    useEffect(() => {
-        console.log(user)
-    }, [user])
 
     function logOut() {
         navigation.navigate('Login')
@@ -72,8 +64,10 @@ function AuthProvider({ children, navigation }: { children: React.ReactNode, nav
             await AsyncStorage.setItem('session', JSON.stringify(res.data))
             await AsyncStorage.setItem('email', email)
             getUserFromSession()
+            return true
         } catch (err) {
             console.log(err);
+            return false
         }
     }
 

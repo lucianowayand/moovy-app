@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
+import { Button, TextInput, Snackbar } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,7 @@ export default function Login({ navigation }: any) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const [fontsLoaded] = useFonts({
         Inter_700Bold,
@@ -27,11 +28,9 @@ export default function Login({ navigation }: any) {
         setLoading(false)
     });
 
-    function submitLogin() {
-        if (email === '' || password === '') {
-            return
-        }
-        logIn(email, password)
+    async function submitLogin() {
+        const result = await logIn(email, password)
+        if (!result) setError(true)
     }
 
     async function getEmailFromStorage() {
@@ -43,6 +42,14 @@ export default function Login({ navigation }: any) {
 
     return <>
         {!loading ? <LinearGradient colors={['#f5d538', '#F2911B']} style={{ height: '100%', width: '100%' }}>
+            <Snackbar
+                wrapperStyle={{ top: 50 }} 
+                visible={error}
+                duration={3000}
+                onDismiss={() => setError(false)}
+            >
+                Invalid Credentials, please try again.
+            </Snackbar>
             {fontsLoaded ? (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <View style={{ backgroundColor: "white", width: '75%', padding: 50 }}>
                     <View style={{ display: 'flex', alignItems: 'center' }}>
